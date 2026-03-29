@@ -1,0 +1,47 @@
+---
+import Layout from '../layouts/Layout.astro';
+import Navbar from '../components/Navbar.astro';
+---
+
+<Layout title="404 — Page not found">
+  <Navbar />
+  <main class="min-h-screen flex items-center justify-center px-6">
+    <div class="text-center max-w-lg">
+      <div class="mb-8">
+        <div class="inline-block rounded-xl border border-surface-800 bg-surface-900/60 overflow-hidden shadow-xl">
+          <div class="flex items-center gap-1.5 px-4 py-2.5 border-b border-surface-800">
+            <div class="w-2.5 h-2.5 rounded-full bg-red-500/80"></div>
+            <div class="w-2.5 h-2.5 rounded-full bg-yellow-500/80"></div>
+            <div class="w-2.5 h-2.5 rounded-full bg-green-500/80"></div>
+            <span class="text-xs text-surface-500 font-mono ml-2">bash</span>
+          </div>
+          <div class="px-6 py-5 font-mono text-sm text-left">
+            <div class="text-surface-500"><span class="text-accent-400">$</span> curl riccardomerenda.dev{Astro.url.pathname}</div>
+            <div class="text-red-400 mt-1">404 Not Found</div>
+            <div class="text-surface-500 mt-2"><span class="text-accent-400">$</span> echo "This page doesn't exist. Yet."</div>
+            <div class="text-surface-300 mt-1">This page doesn't exist. Yet.</div>
+            <div class="mt-2">
+              <span class="text-accent-400">$</span>
+              <span class="inline-block w-2 h-4 bg-surface-400 animate-pulse ml-1"></span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <h1 class="text-6xl font-bold text-white mb-4">404</h1>
+      <p class="text-surface-400 mb-8">
+        Looks like this route isn't mapped yet. Let's get you back on track.
+      </p>
+
+      <a
+        href="/"
+        class="inline-flex items-center gap-2 px-6 py-3 rounded-lg bg-primary-600 hover:bg-primary-500 text-white font-medium transition-all hover:shadow-lg hover:shadow-primary-600/25"
+      >
+        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18" />
+        </svg>
+        Back to home
+      </a>
+    </div>
+  </main>
+</Layout>
