@@ -1,0 +1,84 @@
+---
+const jobs = [
+  {
+    role: 'Senior Software Engineer',
+    company: 'Stuttgart IT',
+    period: 'Apr 2024 — Present',
+    current: true,
+    description:
+      'Leading development of AI-powered solutions and .NET microservices. Building MCP servers and LLM evaluation tooling. Architecting data exchange platforms across distributed systems.',
+    highlights: ['AI Infrastructure', '.NET 10', 'MCP Protocol', 'Elasticsearch'],
+  },
+  {
+    role: 'Software Engineer',
+    company: 'Stuttgart IT',
+    period: 'May 2019 — Apr 2024',
+    current: false,
+    description:
+      'Designed and implemented enterprise-grade APIs and data processing pipelines. Migrated legacy systems to modern .NET architectures. Built internal tools and automation workflows.',
+    highlights: ['.NET Core', 'REST APIs', 'Azure', 'CI/CD'],
+  },
+  {
+    role: 'Computer Engineer',
+    company: 'National Institute of Geophysics and Volcanology',
+    period: '2013 — 2019',
+    current: false,
+    description:
+      'Developed real-time monitoring systems and collaborative data platforms for volcanological research. Built infrastructure for tephra observation networks and multi-hazard surveillance.',
+    highlights: ['Data Systems', 'Real-time Monitoring', 'Scientific Computing', 'Research'],
+  },
+];
+---
+
+<section id="experience" class="py-24 md:py-32 border-t border-surface-800/50">
+  <div class="mx-auto max-w-6xl px-6">
+    <div class="mb-16">
+      <p class="text-sm font-mono text-primary-400 mb-3">// experience</p>
+      <h2 class="text-3xl md:text-4xl font-bold text-white">Where I've worked</h2>
+    </div>
+
+    <div class="relative">
+      <!-- Timeline line -->
+      <div
+        class="absolute left-0 md:left-8 top-0 bottom-0 w-px bg-gradient-to-b from-primary-600 via-surface-700 to-transparent"
+      >
+      </div>
+
+      <div class="space-y-12">
+        {
+          jobs.map((job) => (
+            <div class="relative pl-8 md:pl-20">
+              {/* Timeline dot */}
+              <div
+                class:list={[
+                  'absolute left-0 md:left-8 -translate-x-1/2 w-3 h-3 rounded-full border-2 mt-2',
+                  job.current
+                    ? 'bg-primary-500 border-primary-400 shadow-sm shadow-primary-500/50'
+                    : 'bg-surface-800 border-surface-600',
+                ]}
+              />
+
+              <div class="group">
+                <div class="flex flex-col md:flex-row md:items-baseline gap-1 md:gap-4 mb-3">
+                  <h3 class="text-lg font-semibold text-white">{job.role}</h3>
+                  <span class="text-primary-400 text-sm font-medium">@ {job.company}</span>
+                </div>
+                <p class="text-xs font-mono text-surface-500 mb-3">{job.period}</p>
+                <p class="text-sm text-surface-400 leading-relaxed mb-4 max-w-2xl">
+                  {job.description}
+                </p>
+                <div class="flex flex-wrap gap-2">
+                  {job.highlights.map((h) => (
+                    <span class="px-2 py-1 text-xs font-mono rounded bg-surface-800/60 text-surface-400 border border-surface-800">
+                      {h}
+                    </span>
+                  ))}
+                </div>
+              </div>
+            </div>
+          ))
+        }
+      </div>
+    </div>
+  </div>
+</section>

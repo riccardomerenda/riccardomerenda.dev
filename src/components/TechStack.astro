@@ -1,0 +1,84 @@
+---
+const categories = [
+  {
+    label: 'Languages',
+    items: [
+      { name: 'C#', level: 'primary' },
+      { name: 'Python', level: 'primary' },
+      { name: 'Go', level: 'secondary' },
+      { name: 'TypeScript', level: 'secondary' },
+    ],
+  },
+  {
+    label: 'Backend',
+    items: [
+      { name: '.NET 10', level: 'primary' },
+      { name: 'Blazor', level: 'primary' },
+      { name: 'FastAPI', level: 'secondary' },
+      { name: 'ASP.NET Core', level: 'primary' },
+    ],
+  },
+  {
+    label: 'Data & Search',
+    items: [
+      { name: 'PostgreSQL', level: 'primary' },
+      { name: 'Elasticsearch', level: 'primary' },
+      { name: 'SQLite', level: 'secondary' },
+      { name: 'Vector DBs', level: 'secondary' },
+    ],
+  },
+  {
+    label: 'AI / ML',
+    items: [
+      { name: 'RAG Pipelines', level: 'primary' },
+      { name: 'Semantic Search', level: 'primary' },
+      { name: 'LLM Agents', level: 'primary' },
+      { name: 'MCP Protocol', level: 'secondary' },
+    ],
+  },
+  {
+    label: 'DevOps',
+    items: [
+      { name: 'Docker', level: 'primary' },
+      { name: 'GitHub Actions', level: 'primary' },
+      { name: 'Fly.io', level: 'secondary' },
+      { name: 'Cloudflare', level: 'secondary' },
+    ],
+  },
+];
+---
+
+<section class="py-24 md:py-32 border-t border-surface-800/50">
+  <div class="mx-auto max-w-6xl px-6">
+    <div class="mb-16">
+      <p class="text-sm font-mono text-primary-400 mb-3">// tech stack</p>
+      <h2 class="text-3xl md:text-4xl font-bold text-white">Tools I work with</h2>
+    </div>
+
+    <div class="grid sm:grid-cols-2 lg:grid-cols-3 gap-8">
+      {
+        categories.map((cat) => (
+          <div>
+            <h3 class="text-xs font-mono uppercase tracking-wider text-surface-500 mb-4">
+              {cat.label}
+            </h3>
+            <div class="flex flex-wrap gap-2">
+              {cat.items.map((item) => (
+                <span
+                  class:list={[
+                    'px-3 py-1.5 text-sm rounded-lg border transition-colors',
+                    item.level === 'primary'
+                      ? 'bg-surface-800/60 border-surface-700 text-surface-200'
+                      : 'bg-surface-900/40 border-surface-800 text-surface-400',
+                  ]}
+                >
+                  {item.name}
+                </span>
+              ))}
+            </div>
+          </div>
+        ))
+      }
+    </div>
+  </div>
+</section>

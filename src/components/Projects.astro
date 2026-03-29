@@ -1,0 +1,111 @@
+---
+const projects = [
+  {
+    title: 'driftcut',
+    tagline: 'Early-stop canary testing for LLM model migrations',
+    description:
+      'Decision gating tool that evaluates quality, latency, and cost before committing to a full LLM model swap. Stratified sampling, parallel execution, and an intelligent decision engine that says STOP, CONTINUE, or PROCEED.',
+    tech: ['Python', 'LiteLLM', 'SQLite', 'Async I/O', 'Pydantic'],
+    github: 'https://github.com/riccardomerenda/driftcut',
+    gradient: 'from-violet-500/20 to-fuchsia-500/20',
+    borderHover: 'hover:border-violet-500/40',
+  },
+  {
+    title: 'elastic-mcp',
+    tagline: 'MCP Server for Elasticsearch',
+    description:
+      'Lets any AI agent — Claude, Copilot, Cursor, ChatGPT — query Elasticsearch via natural language. Pure translator between MCP protocol and Elasticsearch API. No LLM calls inside — the intelligence lives in the client.',
+    tech: ['C#', '.NET 10', 'MCP Protocol', 'Elasticsearch 9', 'xUnit'],
+    github: 'https://github.com/riccardomerenda/elastic-mcp',
+    gradient: 'from-cyan-500/20 to-blue-500/20',
+    borderHover: 'hover:border-cyan-500/40',
+  },
+  {
+    title: 'logq',
+    tagline: 'Fast, interactive log explorer for the terminal',
+    description:
+      'Treats log files as queryable databases. Live filtering, time histograms, JSON drill-down, trace following, pattern clustering, and bookmarking. Zero external dependencies.',
+    tech: ['Go', 'Zero deps', 'Inverted indexes', 'Binary search'],
+    github: 'https://github.com/riccardomerenda/logq',
+    gradient: 'from-emerald-500/20 to-teal-500/20',
+    borderHover: 'hover:border-emerald-500/40',
+  },
+  {
+    title: 'FamilyFinance',
+    tagline: 'Personal & family wealth management dashboard',
+    description:
+      'Full-featured financial dashboard with monthly snapshots, investment portfolio tracking, savings goals, expense budgeting, and intelligent transaction matching. Multi-user with role-based permissions.',
+    tech: ['.NET 10', 'Blazor', 'SQLite', 'Tailwind CSS', 'Fly.io'],
+    github: 'https://github.com/riccardomerenda/FamilyFinance',
+    gradient: 'from-amber-500/20 to-orange-500/20',
+    borderHover: 'hover:border-amber-500/40',
+  },
+];
+---
+
+<section id="projects" class="py-24 md:py-32">
+  <div class="mx-auto max-w-6xl px-6">
+    <div class="mb-16">
+      <p class="text-sm font-mono text-primary-400 mb-3">// featured projects</p>
+      <h2 class="text-3xl md:text-4xl font-bold text-white">Things I've built</h2>
+      <p class="text-surface-400 mt-4 max-w-2xl">
+        Open-source tools and systems at the intersection of AI infrastructure, backend
+        engineering, and developer experience.
+      </p>
+    </div>
+
+    <div class="grid md:grid-cols-2 gap-6">
+      {
+        projects.map((project) => (
+          <a
+            href={project.github}
+            target="_blank"
+            rel="noopener noreferrer"
+            class:list={[
+              'group block p-6 rounded-xl border border-surface-800 bg-surface-900/30 transition-all duration-300',
+              project.borderHover,
+            ]}
+          >
+            <div class:list={['absolute inset-0 rounded-xl bg-gradient-to-br opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none', project.gradient]} />
+
+            <div class="relative">
+              <div class="flex items-start justify-between mb-4">
+                <div>
+                  <h3 class="text-xl font-semibold text-white group-hover:text-primary-300 transition-colors">
+                    {project.title}
+                  </h3>
+                  <p class="text-sm text-surface-400 mt-1">{project.tagline}</p>
+                </div>
+                <svg
+                  class="w-5 h-5 text-surface-600 group-hover:text-surface-400 transition-all group-hover:-translate-y-0.5 group-hover:translate-x-0.5 shrink-0 mt-1"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    stroke-width="2"
+                    d="M7 17L17 7M17 7H7M17 7v10"
+                  />
+                </svg>
+              </div>
+
+              <p class="text-sm text-surface-400 leading-relaxed mb-5">
+                {project.description}
+              </p>
+
+              <div class="flex flex-wrap gap-2">
+                {project.tech.map((t) => (
+                  <span class="px-2.5 py-1 text-xs font-mono rounded-md bg-surface-800/80 text-surface-300 border border-surface-700/50">
+                    {t}
+                  </span>
+                ))}
+              </div>
+            </div>
+          </a>
+        ))
+      }
+    </div>
+  </div>
+</section>
