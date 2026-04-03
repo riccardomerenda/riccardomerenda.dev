@@ -49,19 +49,19 @@ const projects = [
     ],
   },
   {
-    title: 'FamilyFinance',
-    tagline: 'Personal & family wealth management dashboard',
+    title: 'steplight',
+    tagline: 'Local-first trace inspector for LLM agents',
     description:
-      'Full-featured financial dashboard with monthly snapshots, investment portfolio tracking, savings goals, expense budgeting, and intelligent transaction matching.',
-    tech: ['.NET 10', 'Blazor', 'SQLite', 'Tailwind CSS', 'Fly.io'],
-    github: 'https://github.com/riccardomerenda/FamilyFinance',
+      'Load a trace, inspect what happened, and understand why. Debug agent runs with timelines, tool calls, retries, token usage, latencies, and diagnostics — all from the terminal.',
+    tech: ['Python', 'Textual', 'Typer', 'OTEL Traces', 'HTML Export'],
+    github: 'https://github.com/riccardomerenda/steplight',
     glowColor: 'rgba(245, 158, 11, 0.5)',
     accentClass: 'text-amber-400',
     terminalLines: [
-      { prompt: true, text: 'dotnet run --project FamilyFinance' },
-      { prompt: false, text: '▸ Dashboard ready at localhost:5000' },
-      { prompt: false, text: '▸ 3 accounts synced · March closing: ✓' },
-      { prompt: false, text: '▸ Savings goal: 78% reached' },
+      { prompt: true, text: 'steplight trace.json' },
+      { prompt: false, text: '▸ 42 spans loaded · 3 tool calls · 2 retries' },
+      { prompt: false, text: '▸ Tokens: 12,840 in / 3,210 out' },
+      { prompt: false, text: '▸ Total latency: 4.2s · Cost: $0.08' },
     ],
   },
 ];
