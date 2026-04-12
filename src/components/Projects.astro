@@ -1,6 +1,22 @@
 ---
 const projects = [
   {
+    title: 'promptscore',
+    tagline: 'Static analysis for LLM prompts',
+    description:
+      'ESLint, but for prompts. Scores a prompt before it reaches the model — flags ambiguity, missing structure, and gaps against model-specific best practices. Deterministic rules, pluggable profiles, zero LLM calls.',
+    tech: ['TypeScript', 'Node.js', 'CLI', 'YAML Profiles', 'npm'],
+    github: 'https://github.com/riccardomerenda/promptscore',
+    glowColor: 'rgba(244, 63, 94, 0.5)',
+    accentClass: 'text-rose-400',
+    terminalLines: [
+      { prompt: true, text: 'promptscore analyze prompt.txt --model claude' },
+      { prompt: false, text: '▸ Profile: claude · 12 rules loaded' },
+      { prompt: false, text: '▸ Score: 62/100 — 1 error, 3 warnings' },
+      { prompt: false, text: '▸ Top: missing-task, no-examples' },
+    ],
+  },
+  {
     title: 'driftcut',
     tagline: 'Early-stop canary testing for LLM model migrations',
     description:
