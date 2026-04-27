@@ -1,10 +1,13 @@
 ---
-let repos = 10;
-let languages = 4;
-let totalStars = 2;
+let repos = 14;
+let languages = 7;
+let totalStars = 7;
 
 try {
-  const res = await fetch('https://api.github.com/users/riccardomerenda/repos?per_page=100&sort=updated');
+  const res = await fetch(
+    'https://api.github.com/users/riccardomerenda/repos?per_page=100&sort=updated',
+    { headers: { 'User-Agent': 'riccardomerenda.dev', Accept: 'application/vnd.github+json' } }
+  );
   if (res.ok) {
     const data = await res.json();
     repos = data.length;
