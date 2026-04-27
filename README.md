@@ -1,43 +1,41 @@
-# Astro Starter Kit: Minimal
+# riccardomerenda.dev
 
-```sh
-npm create astro@latest -- --template minimal
+Personal website of [Riccardo Merenda](https://github.com/riccardomerenda) — AI & Backend Engineer.
+
+Live at **[riccardomerenda.dev](https://riccardomerenda.dev)**.
+
+## Stack
+
+- [Astro 6](https://astro.build) — content-first, zero-JS by default
+- [Tailwind CSS 4](https://tailwindcss.com) — via the Vite plugin
+- [Cloudflare Workers](https://developers.cloudflare.com/workers/) — SSR at the edge, deployed with Wrangler
+- Variable fonts: [Inter](https://rsms.me/inter/) + [JetBrains Mono](https://www.jetbrains.com/mono/)
+
+## Project structure
+
+```
+src/
+├── layouts/Layout.astro    # <head>, fonts, scroll & spotlight scripts
+├── pages/
+│   ├── index.astro         # composes the homepage sections
+│   └── 404.astro
+├── components/             # one .astro file per homepage section
+└── styles/global.css       # design tokens & utilities
+public/
+├── og-image.png            # social card
+├── favicon.svg
+└── robots.txt
 ```
 
-> 🧑‍🚀 **Seasoned astronaut?** Delete this file. Have fun!
+## Commands
 
-## 🚀 Project Structure
+| Command            | What it does                                |
+| :----------------- | :------------------------------------------ |
+| `npm run dev`      | Start Astro dev server on `localhost:4321`  |
+| `npm run build`    | Build to `./dist/`                          |
+| `npm run preview`  | Build, then serve via local Wrangler        |
+| `npm run deploy`   | Build and deploy to Cloudflare              |
 
-Inside of your Astro project, you'll see the following folders and files:
+## License
 
-```text
-/
-├── public/
-├── src/
-│   └── pages/
-│       └── index.astro
-└── package.json
-```
-
-Astro looks for `.astro` or `.md` files in the `src/pages/` directory. Each page is exposed as a route based on its file name.
-
-There's nothing special about `src/components/`, but that's where we like to put any Astro/React/Vue/Svelte/Preact components.
-
-Any static assets, like images, can be placed in the `public/` directory.
-
-## 🧞 Commands
-
-All commands are run from the root of the project, from a terminal:
-
-| Command                   | Action                                           |
-| :------------------------ | :----------------------------------------------- |
-| `npm install`             | Installs dependencies                            |
-| `npm run dev`             | Starts local dev server at `localhost:4321`      |
-| `npm run build`           | Build your production site to `./dist/`          |
-| `npm run preview`         | Preview your build locally, before deploying     |
-| `npm run astro ...`       | Run CLI commands like `astro add`, `astro check` |
-| `npm run astro -- --help` | Get help using the Astro CLI                     |
-
-## 👀 Want to learn more?
-
-Feel free to check [our documentation](https://docs.astro.build) or jump into our [Discord server](https://astro.build/chat).
+Code is MIT. Content (copy, images, design) is © Riccardo Merenda.
