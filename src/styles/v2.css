@@ -1,0 +1,265 @@
+@import "tailwindcss";
+
+/* ============================================================
+   FLUX — v2 design system
+   A near-black, phosphor-signal aesthetic for an AI-infra engineer.
+   ============================================================ */
+
+@theme {
+  /* Cool near-black neutral ramp */
+  --color-ink-950: #07080b;
+  --color-ink-900: #0b0d12;
+  --color-ink-850: #11141b;
+  --color-ink-800: #181c25;
+  --color-ink-700: #262b37;
+  --color-ink-600: #38404f;
+  --color-ink-500: #535c6e;
+  --color-ink-400: #7a8497;
+  --color-ink-300: #a4adbe;
+  --color-ink-200: #c9d0dc;
+  --color-ink-100: #e6eaf1;
+  --color-ink-50: #f5f7fa;
+
+  /* Signal accents */
+  --color-signal-400: #c9ff66;
+  --color-signal-500: #b6f94c;   /* primary phosphor lime */
+  --color-signal-600: #93d626;
+  --color-flux-400: #5cf2e0;
+  --color-flux-500: #38e8d4;     /* teal-cyan */
+  --color-flux-600: #16c4b2;
+  --color-plasma-500: #a78bfa;   /* soft violet, tertiary */
+
+  --font-display: 'Inter Variable', ui-sans-serif, system-ui, sans-serif;
+  --font-mono: 'JetBrains Mono Variable', ui-monospace, monospace;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body.flux {
+  background-color: var(--color-ink-950);
+  color: var(--color-ink-200);
+  font-family: var(--font-display);
+  overflow-x: hidden;
+}
+
+body.flux ::selection {
+  background-color: var(--color-signal-500);
+  color: var(--color-ink-950);
+}
+
+/* Hide native cursor on fine-pointer devices (custom cursor takes over) */
+@media (pointer: fine) {
+  body.flux,
+  body.flux a,
+  body.flux button {
+    cursor: none;
+  }
+}
+
+/* ── Custom cursor ── */
+.cursor-ring,
+.cursor-dot {
+  position: fixed;
+  top: 0;
+  left: 0;
+  pointer-events: none;
+  z-index: 9999;
+  border-radius: 9999px;
+  transform: translate(-50%, -50%);
+  will-change: transform;
+}
+.cursor-dot {
+  width: 6px;
+  height: 6px;
+  background: var(--color-signal-500);
+}
+.cursor-ring {
+  width: 34px;
+  height: 34px;
+  border: 1px solid color-mix(in srgb, var(--color-signal-500) 60%, transparent);
+  transition: width 0.25s ease, height 0.25s ease, border-color 0.25s ease, background-color 0.25s ease;
+}
+.cursor-ring.is-hover {
+  width: 56px;
+  height: 56px;
+  border-color: color-mix(in srgb, var(--color-flux-500) 70%, transparent);
+  background: color-mix(in srgb, var(--color-flux-500) 10%, transparent);
+}
+@media (pointer: coarse) {
+  .cursor-ring,
+  .cursor-dot { display: none; }
+}
+
+/* ── Scroll progress bar ── */
+.scroll-progress {
+  position: fixed;
+  top: 0;
+  left: 0;
+  height: 2px;
+  width: 100%;
+  transform-origin: 0 50%;
+  transform: scaleX(0);
+  background: linear-gradient(90deg, var(--color-signal-500), var(--color-flux-500));
+  z-index: 60;
+}
+
+/* ── Grain ── */
+.flux-grain {
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 50;
+  opacity: 0.035;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 512 512' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.75' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+  background-size: 220px 220px;
+}
+
+/* ── Hero canvas ── */
+.flux-canvas {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 0;
+}
+
+/* ── Gradient text ── */
+.text-gradient {
+  background: linear-gradient(110deg, var(--color-signal-500) 0%, var(--color-flux-500) 60%, var(--color-plasma-500) 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+
+/* ── Display type ── */
+.display {
+  font-weight: 800;
+  letter-spacing: -0.04em;
+  line-height: 0.92;
+}
+.display-xl {
+  font-size: clamp(2.75rem, 9vw, 8.5rem);
+}
+
+/* Outlined / ghost text */
+.text-outline {
+  color: transparent;
+  -webkit-text-stroke: 1px var(--color-ink-700);
+}
+
+/* ── Reveal on scroll (with safe fallbacks) ── */
+[data-reveal] {
+  opacity: 0;
+  transform: translateY(30px);
+  transition: opacity 0.8s cubic-bezier(0.16, 1, 0.3, 1),
+              transform 0.8s cubic-bezier(0.16, 1, 0.3, 1);
+}
+[data-reveal].is-in {
+  opacity: 1;
+  transform: none;
+}
+[data-reveal][data-reveal-d="1"] { transition-delay: 0.08s; }
+[data-reveal][data-reveal-d="2"] { transition-delay: 0.16s; }
+[data-reveal][data-reveal-d="3"] { transition-delay: 0.24s; }
+[data-reveal][data-reveal-d="4"] { transition-delay: 0.32s; }
+[data-reveal][data-reveal-d="5"] { transition-delay: 0.40s; }
+
+@media (prefers-reduced-motion: reduce) {
+  html { scroll-behavior: auto; }
+  [data-reveal] { opacity: 1 !important; transform: none !important; transition: none !important; }
+  .flux-marquee__track { animation: none !important; }
+}
+
+/* ── Infinite marquee ── */
+.flux-marquee {
+  overflow: hidden;
+  -webkit-mask-image: linear-gradient(90deg, transparent, #000 8%, #000 92%, transparent);
+  mask-image: linear-gradient(90deg, transparent, #000 8%, #000 92%, transparent);
+}
+.flux-marquee__track {
+  display: inline-flex;
+  white-space: nowrap;
+  will-change: transform;
+  animation: flux-marquee 38s linear infinite;
+}
+.flux-marquee:hover .flux-marquee__track {
+  animation-play-state: paused;
+}
+@keyframes flux-marquee {
+  to { transform: translateX(-50%); }
+}
+
+/* ── Bento card spotlight ── */
+.bento {
+  position: relative;
+  overflow: hidden;
+  isolation: isolate;
+  background: linear-gradient(180deg, color-mix(in srgb, var(--color-ink-850) 80%, transparent), color-mix(in srgb, var(--color-ink-900) 90%, transparent));
+  border: 1px solid var(--color-ink-800);
+  transition: border-color 0.4s ease, transform 0.4s cubic-bezier(0.16,1,0.3,1);
+}
+.bento::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  opacity: 0;
+  transition: opacity 0.4s ease;
+  background: radial-gradient(
+    480px circle at var(--mx, 50%) var(--my, 50%),
+    color-mix(in srgb, var(--accent, var(--color-signal-500)) 16%, transparent),
+    transparent 45%
+  );
+}
+.bento:hover {
+  border-color: color-mix(in srgb, var(--accent, var(--color-signal-500)) 45%, var(--color-ink-700));
+  transform: translateY(-3px);
+}
+.bento:hover::before { opacity: 1; }
+
+/* Accent line that draws in on reveal */
+.accent-rule {
+  height: 1px;
+  width: 0;
+  background: linear-gradient(90deg, var(--color-signal-500), transparent);
+  transition: width 1s cubic-bezier(0.16,1,0.3,1) 0.2s;
+}
+.is-in .accent-rule { width: 100%; }
+
+/* Nav */
+.flux-nav {
+  transition: background-color 0.4s ease, backdrop-filter 0.4s ease, border-color 0.4s ease;
+  border-bottom: 1px solid transparent;
+}
+.flux-nav.is-stuck {
+  background: color-mix(in srgb, var(--color-ink-950) 72%, transparent);
+  backdrop-filter: blur(14px);
+  border-bottom-color: var(--color-ink-800);
+}
+
+/* Glow underline link */
+.nav-link {
+  position: relative;
+}
+.nav-link::after {
+  content: '';
+  position: absolute;
+  left: 0;
+  bottom: -4px;
+  height: 1px;
+  width: 0;
+  background: var(--color-signal-500);
+  transition: width 0.3s ease;
+}
+.nav-link:hover::after { width: 100%; }
+
+/* Soft floating blobs for non-hero sections */
+.aura {
+  position: absolute;
+  border-radius: 9999px;
+  filter: blur(120px);
+  pointer-events: none;
+  z-index: 0;
+}

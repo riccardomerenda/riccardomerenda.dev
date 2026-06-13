@@ -1,0 +1,57 @@
+---
+interface Props {
+  title?: string;
+  description?: string;
+}
+
+import '@fontsource-variable/inter';
+import '@fontsource-variable/jetbrains-mono';
+
+const {
+  title = 'Riccardo Merenda — AI & Backend Engineer',
+  description = 'Senior Software Engineer building the infrastructure between AI and data — MCP servers, LLM tooling, agent observability, and developer CLIs.',
+} = Astro.props;
+---
+
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="description" content={description} />
+    <meta name="author" content="Riccardo Merenda" />
+
+    <meta property="og:title" content={title} />
+    <meta property="og:description" content={description} />
+    <meta property="og:type" content="website" />
+    <meta property="og:url" content="https://riccardomerenda.dev" />
+    <meta property="og:image" content="https://riccardomerenda.dev/og-image.png" />
+    <meta property="og:image:width" content="1200" />
+    <meta property="og:image:height" content="630" />
+    <meta name="twitter:card" content="summary_large_image" />
+
+    <link rel="icon" type="image/svg+xml" href="/favicon-flux.svg" />
+    <title>{title}</title>
+
+    <style is:global>
+      @import '../styles/v2.css';
+    </style>
+
+    <!-- No-JS safety: reveal everything, no hidden content -->
+    <noscript>
+      <style>
+        [data-reveal] { opacity: 1 !important; transform: none !important; }
+        .cursor-ring, .cursor-dot, .flux-canvas { display: none !important; }
+        body.flux { cursor: auto !important; }
+      </style>
+    </noscript>
+  </head>
+  <body class="flux antialiased">
+    <div class="scroll-progress" id="scroll-progress"></div>
+    <div class="cursor-ring" id="cursor-ring" aria-hidden="true"></div>
+    <div class="cursor-dot" id="cursor-dot" aria-hidden="true"></div>
+    <div class="flux-grain" aria-hidden="true"></div>
+
+    <slot />
+  </body>
+</html>

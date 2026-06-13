@@ -1,31 +1,789 @@
 ---
-import Layout from '../layouts/Layout.astro';
-import Navbar from '../components/Navbar.astro';
-import Hero from '../components/Hero.astro';
-import About from '../components/About.astro';
-import Projects from '../components/Projects.astro';
-import TechStack from '../components/TechStack.astro';
-import GitHubStats from '../components/GitHubStats.astro';
-import Experience from '../components/Experience.astro';
-import Contact from '../components/Contact.astro';
-import Footer from '../components/Footer.astro';
+import V2Layout from '../layouts/V2Layout.astro';
 
-Astro.response.headers.set(
-  'Cache-Control',
-  'public, s-maxage=3600, stale-while-revalidate=86400'
-);
+// ── GitHub stats (live, with graceful fallback) ──
+let repos = 14;
+let languages = 7;
+let totalStars = 7;
+try {
+  const res = await fetch(
+    'https://api.github.com/users/riccardomerenda/repos?per_page=100&sort=updated',
+    { headers: { 'User-Agent': 'riccardomerenda.dev', Accept: 'application/vnd.github+json' } }
+  );
+  if (res.ok) {
+    const data = await res.json();
+    repos = data.length;
+    languages = new Set(data.map((r: any) => r.language).filter(Boolean)).size;
+    totalStars = data.reduce((s: number, r: any) => s + (r.stargazers_count || 0), 0);
+  }
+} catch { /* defaults */ }
+
+const yearsShipping = new Date().getFullYear() - 2013;
+
+const rotating = ['MCP servers', 'LLM eval tooling', 'agent observability', 'developer CLIs'];
+
+const navLinks = [
+  { href: '#work', label: 'Work' },
+  { href: '#stack', label: 'Stack' },
+  { href: '#path', label: 'Path' },
+  { href: '#contact', label: 'Contact' },
+];
+
+const pillars = [
+  {
+    n: '01',
+    title: 'AI & Search Systems',
+    body: 'Semantic search engines, RAG pipelines, MCP servers, agent observability, and agentic workflows that connect LLMs to real data sources.',
+    accent: 'var(--color-plasma-500)',
+  },
+  {
+    n: '02',
+    title: 'Backend Engineering',
+    body: 'Scalable microservices with .NET, FastAPI, PostgreSQL and Elasticsearch — shipped with Docker and CI/CD pipelines that don’t page you at 3am.',
+    accent: 'var(--color-flux-500)',
+  },
+  {
+    n: '03',
+    title: 'Developer Tools',
+    body: 'Terminal utilities, CLI tools, and open-source productivity software. Built for the people who live in the terminal — because I’m one of them.',
+    accent: 'var(--color-signal-500)',
+  },
+];
+
+const projects = [
+  {
+    name: 'promptscore',
+    tagline: 'Static analysis for LLM prompts',
+    description:
+      'ESLint, but for prompts. Scores a prompt before it reaches the model — flags ambiguity, missing structure, and gaps against model-specific best practices. Deterministic rules, pluggable profiles, zero LLM calls.',
+    tech: ['TypeScript', 'Node.js', 'CLI', 'YAML Profiles', 'npm'],
+    github: 'https://github.com/riccardomerenda/promptscore',
+    accent: 'var(--color-signal-500)',
+    featured: true,
+    terminal: [
+      { p: true, t: 'promptscore analyze prompt.txt --model claude' },
+      { p: false, t: '▸ Profile: claude · 12 rules loaded' },
+      { p: false, t: '▸ Score: 62/100 — 1 error, 3 warnings' },
+      { p: false, t: '▸ Top: missing-task, no-examples' },
+    ],
+  },
+  {
+    name: 'driftcut',
+    tagline: 'Canary testing for model migrations',
+    description:
+      'Decision gating for LLM model swaps. Evaluates quality, latency and cost on a stratified sample before you commit to a full migration.',
+    tech: ['Python', 'LiteLLM', 'SQLite', 'Pydantic'],
+    github: 'https://github.com/riccardomerenda/driftcut',
+    accent: 'var(--color-plasma-500)',
+    terminal: [
+      { p: true, t: 'driftcut evaluate --model gpt-4.1' },
+      { p: false, t: '▸ Sampling 150 prompts · 8 categories' },
+      { p: false, t: '✓ Decision: PROCEED' },
+    ],
+  },
+  {
+    name: 'elastic-mcp',
+    tagline: 'MCP server for Elasticsearch',
+    description:
+      'Lets any AI agent query Elasticsearch in natural language. A pure translator between the MCP protocol and the ES API.',
+    tech: ['C#', '.NET 10', 'MCP', 'Elasticsearch 9'],
+    github: 'https://github.com/riccardomerenda/elastic-mcp',
+    accent: 'var(--color-flux-500)',
+    terminal: [
+      { p: true, t: 'elastic-mcp --index logs-*' },
+      { p: false, t: '▸ MCP server listening on stdio' },
+      { p: false, t: '▸ Tools: search, semantic, aggregate' },
+    ],
+  },
+  {
+    name: 'logq',
+    tagline: 'Interactive log explorer for the terminal',
+    description:
+      'Treats log files as queryable databases — live filtering, time histograms, JSON drill-down, pattern clustering. Zero external dependencies.',
+    tech: ['Go', 'Zero deps', 'Inverted index'],
+    github: 'https://github.com/riccardomerenda/logq',
+    accent: 'var(--color-signal-500)',
+    terminal: [
+      { p: true, t: 'logq app.log -f' },
+      { p: false, t: '▸ 142,891 records indexed in 0.3s' },
+      { p: false, t: '▸ 23 matches · 4 clusters' },
+    ],
+  },
+  {
+    name: 'steplight',
+    tagline: 'Local-first trace inspector for LLM agents',
+    description:
+      'Load a trace, inspect what happened, and understand why. Timelines, tool calls, retries, token usage and latencies — all from the terminal.',
+    tech: ['Python', 'Textual', 'OTEL', 'Typer'],
+    github: 'https://github.com/riccardomerenda/steplight',
+    accent: 'var(--color-flux-500)',
+    terminal: [
+      { p: true, t: 'steplight trace.json' },
+      { p: false, t: '▸ 42 spans · 3 tool calls · 2 retries' },
+      { p: false, t: '▸ 12,840 in / 3,210 out · $0.08' },
+    ],
+  },
+];
+
+const stack = [
+  { label: 'Languages', items: ['C#', 'Python', 'Go', 'TypeScript'] },
+  { label: 'Backend', items: ['.NET 10', 'Blazor', 'FastAPI', 'ASP.NET Core'] },
+  { label: 'Data & Search', items: ['PostgreSQL', 'Elasticsearch', 'SQLite', 'Vector DBs'] },
+  { label: 'AI / ML', items: ['RAG Pipelines', 'Semantic Search', 'LLM Agents', 'Agent Observability', 'MCP Protocol'] },
+  { label: 'DevOps', items: ['Docker', 'GitHub Actions', 'Fly.io', 'Cloudflare'] },
+];
+
+const stats = [
+  { value: repos, label: 'Public repos' },
+  { value: languages, label: 'Languages' },
+  { value: totalStars, label: 'GitHub stars' },
+  { value: yearsShipping, label: 'Years shipping', suffix: '' },
+];
+
+const jobs = [
+  {
+    role: 'Senior Software Engineer',
+    company: 'Stuttgart IT',
+    period: '2024 — Now',
+    current: true,
+    body: 'Leading AI-powered solutions and .NET microservices. Building MCP servers and LLM evaluation tooling, architecting data-exchange platforms across distributed systems.',
+    tags: ['AI Infrastructure', '.NET 10', 'MCP', 'Elasticsearch'],
+  },
+  {
+    role: 'Software Engineer',
+    company: 'Stuttgart IT',
+    period: '2019 — 2024',
+    current: false,
+    body: 'Designed enterprise-grade APIs and data pipelines. Migrated legacy systems to modern .NET, built internal tools and automation workflows.',
+    tags: ['.NET Core', 'REST APIs', 'Azure', 'CI/CD'],
+  },
+  {
+    role: 'Computer Engineer',
+    company: 'Nat. Institute of Geophysics & Volcanology',
+    period: '2013 — 2019',
+    current: false,
+    body: 'Built real-time monitoring systems and collaborative data platforms for volcanological research — infrastructure for tephra observation networks and multi-hazard surveillance.',
+    tags: ['Data Systems', 'Real-time', 'Scientific Computing'],
+  },
+];
+
+const marquee = ['MCP', 'RAG', 'Elasticsearch', '.NET', 'Python', 'Go', 'LLM Agents', 'Vector Search', 'Observability', 'Developer Tools', 'FastAPI', 'CLI', 'Semantic Search', 'Docker'];
 ---
 
-<Layout>
-  <Navbar />
-  <main>
-    <Hero />
-    <About />
-    <Projects />
-    <TechStack />
-    <GitHubStats />
-    <Experience />
-    <Contact />
+<V2Layout>
+  <!-- ══════════ NAV ══════════ -->
+  <nav id="nav" class="flux-nav fixed top-0 inset-x-0 z-40">
+    <div class="mx-auto max-w-7xl px-6 lg:px-10 py-5 flex items-center justify-between">
+      <a href="#top" class="font-mono text-sm tracking-tight text-ink-100 magnetic" data-cursor>
+        <span class="text-signal-500">riccardo</span><span class="text-ink-500">@</span>merenda<span class="text-flux-500">.dev</span>
+      </a>
+      <div class="hidden md:flex items-center gap-9">
+        {navLinks.map((l) => (
+          <a href={l.href} data-cursor class="nav-link font-mono text-[13px] text-ink-400 hover:text-ink-100 transition-colors">{l.label}</a>
+        ))}
+      </div>
+      <a href="#contact" data-cursor class="magnetic hidden sm:inline-flex items-center gap-2 rounded-full border border-ink-700 px-4 py-2 font-mono text-[13px] text-ink-200 hover:border-signal-500 hover:text-signal-500 transition-colors">
+        <span class="w-1.5 h-1.5 rounded-full bg-signal-500 animate-pulse"></span>
+        Available
+      </a>
+    </div>
+  </nav>
+
+  <main id="top">
+    <!-- ══════════ HERO ══════════ -->
+    <section class="relative min-h-screen flex items-center overflow-hidden">
+      <canvas id="flux-canvas" class="flux-canvas" aria-hidden="true"></canvas>
+      <!-- soft halo behind the headline only — the night sky stays visible across the whole hero -->
+      <div class="absolute inset-0 z-[1] pointer-events-none" style="background: radial-gradient(70% 65% at 38% 50%, color-mix(in srgb, var(--color-ink-950) 58%, transparent) 0%, transparent 72%), linear-gradient(0deg, var(--color-ink-950) 0%, transparent 18%);"></div>
+
+      <div class="relative z-[2] mx-auto max-w-7xl px-6 lg:px-10 w-full pt-28 pb-20">
+        <p data-reveal class="font-mono text-[13px] tracking-[0.25em] uppercase text-signal-500 mb-8">
+          Senior Software Engineer &nbsp;/&nbsp; Ragusa, Sicily
+        </p>
+
+        <h1 class="display display-xl text-ink-50 max-w-5xl">
+          <span data-reveal data-reveal-d="1" class="block">Building the</span>
+          <span data-reveal data-reveal-d="2" class="block text-gradient">infrastructure</span>
+          <span data-reveal data-reveal-d="3" class="block">between <span class="text-outline">AI</span> &amp; data.</span>
+        </h1>
+
+        <div data-reveal data-reveal-d="4" class="mt-10 flex flex-col sm:flex-row sm:items-center gap-x-3 gap-y-2 font-mono text-ink-400 text-sm md:text-base">
+          <span class="text-ink-500">$ currently building</span>
+          <span class="inline-flex items-center text-ink-100">
+            <span class="text-signal-500 mr-2">▸</span>
+            <span id="rotator" class="text-ink-100">{rotating[0]}</span>
+            <span class="inline-block w-2 h-[1.1em] bg-signal-500 ml-1 align-middle animate-pulse"></span>
+          </span>
+        </div>
+
+        <p data-reveal data-reveal-d="4" class="mt-8 max-w-xl text-ink-300 leading-relaxed">
+          I build the plumbing that connects AI agents to real-world data — MCP servers,
+          evaluation tooling, observability, and the developer tools around them.
+        </p>
+
+        <div data-reveal data-reveal-d="5" class="mt-10 flex flex-wrap gap-4">
+          <a href="#work" data-cursor class="magnetic group inline-flex items-center gap-2 rounded-full bg-signal-500 px-7 py-3.5 font-medium text-ink-950 hover:bg-signal-400 transition-colors">
+            View the work
+            <svg class="w-4 h-4 transition-transform group-hover:translate-x-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.2" d="M5 12h14M13 6l6 6-6 6"/></svg>
+          </a>
+          <a href="#contact" data-cursor class="magnetic inline-flex items-center gap-2 rounded-full border border-ink-700 px-7 py-3.5 text-ink-200 hover:border-ink-500 hover:text-ink-50 transition-colors">
+            Get in touch
+          </a>
+        </div>
+      </div>
+
+      <!-- scroll hint -->
+      <div class="absolute bottom-8 left-1/2 -translate-x-1/2 z-[2] flex flex-col items-center gap-2 text-ink-600">
+        <span class="font-mono text-[10px] tracking-[0.3em] uppercase">scroll</span>
+        <span class="w-px h-10 bg-gradient-to-b from-ink-600 to-transparent"></span>
+      </div>
+    </section>
+
+    <!-- ══════════ MARQUEE ══════════ -->
+    <div class="border-y border-ink-800 py-5 bg-ink-900/40">
+      <div class="flux-marquee">
+        <div class="flux-marquee__track">
+          {[...marquee, ...marquee].map((m) => (
+            <span class="mx-7 font-mono text-sm uppercase tracking-wider text-ink-500">
+              {m} <span class="text-signal-600/60 ml-7">/</span>
+            </span>
+          ))}
+        </div>
+      </div>
+    </div>
+
+    <!-- ══════════ ABOUT / PILLARS ══════════ -->
+    <section id="about" class="relative py-28 md:py-40">
+      <div class="aura w-[480px] h-[480px] -left-40 top-20" style="background: color-mix(in srgb, var(--color-plasma-500) 14%, transparent);"></div>
+      <div class="relative mx-auto max-w-7xl px-6 lg:px-10">
+        <div class="grid lg:grid-cols-[0.9fr_1.1fr] gap-12 lg:gap-20">
+          <div data-reveal class="lg:sticky lg:top-32 self-start">
+            <p class="font-mono text-[13px] text-signal-500 mb-5">// what I do</p>
+            <h2 class="display text-4xl md:text-6xl text-ink-50">Three things,<br />done deeply.</h2>
+            <p class="mt-7 text-ink-400 leading-relaxed max-w-sm">
+              I work where AI meets production data. Not demos — systems that run, observe
+              themselves, and stay debuggable under load.
+            </p>
+
+            <!-- profile spec -->
+            <dl class="mt-10 grid grid-cols-[auto_1fr] gap-x-10 gap-y-3.5 font-mono text-sm max-w-xs border-t border-ink-800 pt-8">
+              <dt class="text-ink-500">based</dt>
+              <dd class="text-ink-200">Ragusa, Sicily</dd>
+              <dt class="text-ink-500">focus</dt>
+              <dd class="text-ink-200">AI Infrastructure</dd>
+              <dt class="text-ink-500">core</dt>
+              <dd class="text-ink-200">.NET · Python · Go</dd>
+              <dt class="text-ink-500">shipping</dt>
+              <dd class="text-ink-200">since 2013</dd>
+              <dt class="text-ink-500">status</dt>
+              <dd class="flex items-center gap-2 text-signal-500">
+                <span class="w-1.5 h-1.5 rounded-full bg-signal-500 animate-pulse"></span>open to work
+              </dd>
+            </dl>
+
+            <!-- decorative constellation — a quiet nod to looking up -->
+            <figure class="mt-12 max-w-xs">
+              <svg viewBox="0 0 200 90" class="w-44 h-auto" fill="none" aria-hidden="true">
+                <g stroke="#262b37" stroke-width="1" stroke-linecap="round">
+                  <line x1="19" y1="24" x2="85.6" y2="33.8" />
+                  <line x1="85.6" y1="33.8" x2="91" y2="56.2" />
+                  <line x1="91" y1="56.2" x2="28" y2="50.6" />
+                  <line x1="28" y1="50.6" x2="19" y2="24" />
+                  <line x1="85.6" y1="33.8" x2="128.8" y2="31" />
+                  <line x1="128.8" y1="31" x2="164.8" y2="25.4" />
+                  <line x1="164.8" y1="25.4" x2="190" y2="15.6" />
+                </g>
+                <g fill="#7a8497">
+                  <circle cx="28" cy="50.6" r="1.8" />
+                  <circle cx="91" cy="56.2" r="1.8" />
+                  <circle cx="85.6" cy="33.8" r="1.8" />
+                  <circle cx="128.8" cy="31" r="1.8" />
+                  <circle cx="164.8" cy="25.4" r="1.8" />
+                  <circle cx="190" cy="15.6" r="2" />
+                </g>
+                <circle cx="19" cy="24" r="4.5" fill="#b6f94c" fill-opacity="0.16" />
+                <circle cx="19" cy="24" r="2.2" fill="#b6f94c" />
+              </svg>
+              <figcaption class="mt-3 font-mono text-[11px] text-ink-600">Ursa Major — still my favourite pointer.</figcaption>
+            </figure>
+          </div>
+
+          <div class="flex flex-col">
+            {pillars.map((p, i) => (
+              <div data-reveal data-reveal-d={String(i + 1)} class="group py-9 border-t border-ink-800 last:border-b" style={`--accent:${p.accent}`}>
+                <div class="flex items-start gap-6">
+                  <span class="font-mono text-sm text-ink-600 pt-1.5 transition-colors group-hover:text-[color:var(--accent)]">{p.n}</span>
+                  <div class="flex-1">
+                    <h3 class="text-2xl md:text-3xl font-semibold text-ink-100 transition-colors group-hover:text-[color:var(--accent)]">{p.title}</h3>
+                    <div class="accent-rule my-4" style="background: linear-gradient(90deg, var(--accent), transparent);"></div>
+                    <p class="text-ink-400 leading-relaxed max-w-lg">{p.body}</p>
+                  </div>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ══════════ WORK / BENTO ══════════ -->
+    <section id="work" class="relative py-24 md:py-32">
+      <div class="mx-auto max-w-7xl px-6 lg:px-10">
+        <div data-reveal class="flex flex-wrap items-end justify-between gap-6 mb-14">
+          <div>
+            <p class="font-mono text-[13px] text-signal-500 mb-5">// selected work</p>
+            <h2 class="display text-4xl md:text-6xl text-ink-50">Things I’ve shipped.</h2>
+          </div>
+          <p class="text-ink-400 max-w-md leading-relaxed">
+            Open-source tools at the intersection of AI infrastructure, backend engineering
+            and developer experience. All on GitHub.
+          </p>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-6 gap-4 md:gap-5 auto-rows-fr">
+          {projects.map((proj, i) => (
+            <a
+              href={proj.github}
+              target="_blank"
+              rel="noopener noreferrer"
+              data-cursor
+              data-reveal
+              data-reveal-d={String((i % 3) + 1)}
+              class:list={[
+                'bento group rounded-2xl p-6 flex flex-col',
+                proj.featured ? 'md:col-span-4 md:row-span-1' : 'md:col-span-2',
+              ]}
+              style={`--accent:${proj.accent}`}
+            >
+              {/* terminal */}
+              <div class="rounded-lg border border-ink-800 bg-ink-950/70 overflow-hidden mb-5">
+                <div class="flex items-center gap-1.5 px-3 py-2 border-b border-ink-800/70">
+                  <span class="w-2 h-2 rounded-full bg-ink-700"></span>
+                  <span class="w-2 h-2 rounded-full bg-ink-700"></span>
+                  <span class="w-2 h-2 rounded-full bg-ink-700"></span>
+                  <span class="ml-2 font-mono text-[10px] text-ink-600">{proj.name}</span>
+                </div>
+                <div class="px-3.5 py-3 font-mono text-[11px] md:text-xs leading-relaxed">
+                  {proj.terminal.map((line) => (
+                    <div class={line.p ? 'text-ink-300' : 'text-ink-500'}>
+                      {line.p && <span style={`color:${proj.accent}`}>$ </span>}{line.t}
+                    </div>
+                  ))}
+                </div>
+              </div>
+
+              <div class="flex items-start justify-between gap-3">
+                <h3 class="text-xl font-semibold text-ink-100 group-hover:text-[color:var(--accent)] transition-colors">{proj.name}</h3>
+                <svg class="w-5 h-5 text-ink-600 shrink-0 transition-all group-hover:text-[color:var(--accent)] group-hover:-translate-y-0.5 group-hover:translate-x-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 17L17 7M17 7H7M17 7v10"/></svg>
+              </div>
+              <p class="text-sm text-ink-400 mt-1">{proj.tagline}</p>
+              <p class="text-sm text-ink-400/90 leading-relaxed mt-4 flex-1">{proj.description}</p>
+              <div class="flex flex-wrap gap-2 mt-5">
+                {proj.tech.map((t) => (
+                  <span class="font-mono text-[11px] rounded-md border border-ink-800 bg-ink-850/60 px-2.5 py-1 text-ink-400">{t}</span>
+                ))}
+              </div>
+            </a>
+          ))}
+        </div>
+      </div>
+    </section>
+
+    <!-- ══════════ STACK ══════════ -->
+    <section id="stack" class="relative py-24 md:py-32 border-t border-ink-800">
+      <div class="mx-auto max-w-7xl px-6 lg:px-10">
+        <div data-reveal class="mb-14">
+          <p class="font-mono text-[13px] text-signal-500 mb-5">// toolkit</p>
+          <h2 class="display text-4xl md:text-6xl text-ink-50">What I reach for.</h2>
+        </div>
+        <div class="grid sm:grid-cols-2 lg:grid-cols-3 gap-x-10 gap-y-12">
+          {stack.map((cat, i) => (
+            <div data-reveal data-reveal-d={String((i % 3) + 1)}>
+              <h3 class="font-mono text-xs uppercase tracking-[0.2em] text-ink-500 mb-5 flex items-center gap-3">
+                <span class="w-5 h-px bg-signal-500"></span>{cat.label}
+              </h3>
+              <div class="flex flex-wrap gap-2.5">
+                {cat.items.map((item) => (
+                  <span data-cursor class="rounded-lg border border-ink-800 bg-ink-850/50 px-3.5 py-2 text-sm text-ink-300 transition-all hover:-translate-y-0.5 hover:border-signal-500/50 hover:text-ink-50">
+                    {item}
+                  </span>
+                ))}
+              </div>
+            </div>
+          ))}
+        </div>
+      </div>
+    </section>
+
+    <!-- ══════════ STATS ══════════ -->
+    <section class="relative py-24 md:py-28 border-t border-ink-800 overflow-hidden">
+      <div class="aura w-[420px] h-[420px] right-0 -top-20" style="background: color-mix(in srgb, var(--color-flux-500) 12%, transparent);"></div>
+      <div class="relative mx-auto max-w-7xl px-6 lg:px-10">
+        <div class="grid grid-cols-2 md:grid-cols-4 gap-6 md:gap-4">
+          {stats.map((s, i) => (
+            <div data-reveal data-reveal-d={String(i + 1)} class="text-center md:text-left">
+              <div class="display text-5xl md:text-7xl text-gradient tabular-nums" data-count={String(s.value)}>0</div>
+              <div class="font-mono text-xs uppercase tracking-wider text-ink-500 mt-3">{s.label}</div>
+            </div>
+          ))}
+        </div>
+        <div data-reveal class="mt-12">
+          <a href="https://github.com/riccardomerenda" target="_blank" rel="noopener noreferrer" data-cursor class="inline-flex items-center gap-2 font-mono text-sm text-ink-400 hover:text-signal-500 transition-colors group">
+            <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 24 24"><path d="M12 0c-6.626 0-12 5.373-12 12 0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23.957-.266 1.983-.399 3.003-.404 1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576 4.765-1.589 8.199-6.086 8.199-11.386 0-6.627-5.373-12-12-12z"/></svg>
+            github.com/riccardomerenda
+            <svg class="w-3.5 h-3.5 transition-transform group-hover:translate-x-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 12h14M13 6l6 6-6 6"/></svg>
+          </a>
+        </div>
+      </div>
+    </section>
+
+    <!-- ══════════ PATH / EXPERIENCE ══════════ -->
+    <section id="path" class="relative py-24 md:py-32 border-t border-ink-800">
+      <div class="mx-auto max-w-7xl px-6 lg:px-10">
+        <div data-reveal class="mb-16">
+          <p class="font-mono text-[13px] text-signal-500 mb-5">// the path</p>
+          <h2 class="display text-4xl md:text-6xl text-ink-50">Where I’ve worked.</h2>
+        </div>
+
+        <div class="flex flex-col">
+          {jobs.map((job, i) => (
+            <div data-reveal data-reveal-d={String(i + 1)} class="group grid md:grid-cols-[200px_1fr] gap-3 md:gap-10 py-10 border-t border-ink-800 last:border-b">
+              <div class="flex items-center gap-3">
+                <span class:list={['w-2 h-2 rounded-full', job.current ? 'bg-signal-500 shadow-[0_0_12px_var(--color-signal-500)]' : 'bg-ink-600']}></span>
+                <span class="font-mono text-sm text-ink-400">{job.period}</span>
+              </div>
+              <div>
+                <div class="flex flex-wrap items-baseline gap-x-3 gap-y-1">
+                  <h3 class="text-2xl font-semibold text-ink-100 group-hover:text-signal-500 transition-colors">{job.role}</h3>
+                  <span class="text-flux-500 text-sm font-mono">@ {job.company}</span>
+                </div>
+                <p class="text-ink-400 leading-relaxed mt-4 max-w-2xl">{job.body}</p>
+                <div class="flex flex-wrap gap-2 mt-5">
+                  {job.tags.map((t) => (
+                    <span class="font-mono text-[11px] rounded border border-ink-800 bg-ink-850/50 px-2.5 py-1 text-ink-500">{t}</span>
+                  ))}
+                </div>
+              </div>
+            </div>
+          ))}
+        </div>
+      </div>
+    </section>
+
+    <!-- ══════════ CONTACT ══════════ -->
+    <section id="contact" class="relative py-28 md:py-44 border-t border-ink-800 overflow-hidden">
+      <div class="aura w-[600px] h-[600px] left-1/2 -translate-x-1/2 bottom-[-300px]" style="background: color-mix(in srgb, var(--color-signal-500) 10%, transparent);"></div>
+      <div class="relative mx-auto max-w-7xl px-6 lg:px-10 text-center">
+        <p data-reveal class="font-mono text-[13px] text-signal-500 mb-7">// let’s build something</p>
+        <h2 data-reveal data-reveal-d="1" class="display text-5xl md:text-8xl text-ink-50 mb-10">
+          Let’s <span class="text-gradient">connect.</span>
+        </h2>
+        <p data-reveal data-reveal-d="2" class="text-ink-400 leading-relaxed max-w-xl mx-auto mb-12">
+          Always up for discussing AI infrastructure, open-source tooling, and hard
+          engineering problems. The inbox is open.
+        </p>
+
+        <div data-reveal data-reveal-d="3" class="flex flex-col sm:flex-row items-center justify-center gap-4">
+          <a id="email-link" href="#" data-cursor class="magnetic group inline-flex items-center gap-3 rounded-full bg-signal-500 px-8 py-4 font-medium text-ink-950 hover:bg-signal-400 transition-colors">
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M21.75 6.75v10.5a2.25 2.25 0 01-2.25 2.25h-15a2.25 2.25 0 01-2.25-2.25V6.75m19.5 0A2.25 2.25 0 0019.5 4.5h-15a2.25 2.25 0 00-2.25 2.25m19.5 0v.243a2.25 2.25 0 01-1.07 1.916l-7.5 4.615a2.25 2.25 0 01-2.36 0L3.32 8.91a2.25 2.25 0 01-1.07-1.916V6.75"/></svg>
+            <span id="email-text">say hello</span>
+          </a>
+          <div class="flex items-center gap-3">
+            <a href="https://github.com/riccardomerenda" target="_blank" rel="noopener noreferrer" data-cursor class="magnetic inline-flex items-center justify-center w-12 h-12 rounded-full border border-ink-700 text-ink-300 hover:border-signal-500 hover:text-signal-500 transition-colors" aria-label="GitHub">
+              <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 24 24"><path d="M12 0c-6.626 0-12 5.373-12 12 0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23.957-.266 1.983-.399 3.003-.404 1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576 4.765-1.589 8.199-6.086 8.199-11.386 0-6.627-5.373-12-12-12z"/></svg>
+            </a>
+            <a href="https://linkedin.com/in/riccardomerenda" target="_blank" rel="noopener noreferrer" data-cursor class="magnetic inline-flex items-center justify-center w-12 h-12 rounded-full border border-ink-700 text-ink-300 hover:border-flux-500 hover:text-flux-500 transition-colors" aria-label="LinkedIn">
+              <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 24 24"><path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433c-1.144 0-2.063-.926-2.063-2.065 0-1.138.92-2.063 2.063-2.063 1.14 0 2.064.925 2.064 2.063 0 1.139-.925 2.065-2.064 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z"/></svg>
+            </a>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ══════════ FOOTER ══════════ -->
+    <footer class="border-t border-ink-800 py-10">
+      <div class="mx-auto max-w-7xl px-6 lg:px-10 flex flex-col md:flex-row items-center justify-between gap-3">
+        <p class="font-mono text-xs text-ink-500">© {new Date().getFullYear()} Riccardo Merenda</p>
+        <p class="font-mono text-xs text-ink-600">Ragusa, Sicily · Built with Astro</p>
+      </div>
+    </footer>
   </main>
-  <Footer />
-</Layout>
+
+  <script>
+    const reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+    // ── Email obfuscation ──
+    (() => {
+      const addr = 'riccardo.merenda' + '@' + 'outlook.com';
+      const link = document.getElementById('email-link') as HTMLAnchorElement | null;
+      const text = document.getElementById('email-text');
+      if (link) link.href = 'mailto:' + addr;
+      if (text) text.textContent = addr;
+    })();
+
+    // ── Reveal on scroll ──
+    (() => {
+      const els = document.querySelectorAll('[data-reveal]');
+      if (reduce || !('IntersectionObserver' in window)) {
+        els.forEach((el) => el.classList.add('is-in'));
+        return;
+      }
+      const io = new IntersectionObserver((entries) => {
+        entries.forEach((e) => {
+          if (e.isIntersecting) { e.target.classList.add('is-in'); io.unobserve(e.target); }
+        });
+      }, { threshold: 0.12, rootMargin: '0px 0px -60px 0px' });
+      els.forEach((el) => io.observe(el));
+    })();
+
+    // ── Scroll progress + sticky nav ──
+    (() => {
+      const bar = document.getElementById('scroll-progress');
+      const nav = document.getElementById('nav');
+      const onScroll = () => {
+        const h = document.documentElement;
+        const p = h.scrollTop / (h.scrollHeight - h.clientHeight || 1);
+        if (bar) bar.style.transform = `scaleX(${p})`;
+        if (nav) nav.classList.toggle('is-stuck', h.scrollTop > 40);
+      };
+      onScroll();
+      window.addEventListener('scroll', onScroll, { passive: true });
+    })();
+
+    // ── Count-up stats ──
+    (() => {
+      const nums = document.querySelectorAll<HTMLElement>('[data-count]');
+      const run = (el: HTMLElement) => {
+        const target = parseInt(el.dataset.count || '0', 10);
+        if (reduce) { el.textContent = String(target); return; }
+        const dur = 1400; const t0 = performance.now();
+        const tick = (t: number) => {
+          const k = Math.min((t - t0) / dur, 1);
+          const eased = 1 - Math.pow(1 - k, 3);
+          el.textContent = String(Math.round(target * eased));
+          if (k < 1) requestAnimationFrame(tick);
+        };
+        requestAnimationFrame(tick);
+      };
+      const io = new IntersectionObserver((entries) => {
+        entries.forEach((e) => { if (e.isIntersecting) { run(e.target as HTMLElement); io.unobserve(e.target); } });
+      }, { threshold: 0.6 });
+      nums.forEach((n) => io.observe(n));
+    })();
+
+    // ── Word rotator ──
+    (() => {
+      const el = document.getElementById('rotator');
+      if (!el || reduce) return;
+      const words = ['MCP servers', 'LLM eval tooling', 'agent observability', 'developer CLIs'];
+      let i = 0;
+      setInterval(() => {
+        i = (i + 1) % words.length;
+        el.style.opacity = '0';
+        el.style.transition = 'opacity .25s ease';
+        setTimeout(() => { el.textContent = words[i]; el.style.opacity = '1'; }, 250);
+      }, 2600);
+    })();
+
+    // ── Bento spotlight ──
+    (() => {
+      document.querySelectorAll<HTMLElement>('.bento').forEach((card) => {
+        card.addEventListener('pointermove', (e) => {
+          const r = card.getBoundingClientRect();
+          card.style.setProperty('--mx', `${e.clientX - r.left}px`);
+          card.style.setProperty('--my', `${e.clientY - r.top}px`);
+        });
+      });
+    })();
+
+    // ── Custom cursor + magnetic ──
+    (() => {
+      if (window.matchMedia('(pointer: coarse)').matches || reduce) return;
+      const dot = document.getElementById('cursor-dot');
+      const ring = document.getElementById('cursor-ring');
+      if (!dot || !ring) return;
+      let mx = innerWidth / 2, my = innerHeight / 2;
+      let rx = mx, ry = my;
+      window.addEventListener('pointermove', (e) => {
+        mx = e.clientX; my = e.clientY;
+        dot.style.transform = `translate(${mx}px, ${my}px) translate(-50%, -50%)`;
+      });
+      const loop = () => {
+        rx += (mx - rx) * 0.18; ry += (my - ry) * 0.18;
+        ring.style.transform = `translate(${rx}px, ${ry}px) translate(-50%, -50%)`;
+        requestAnimationFrame(loop);
+      };
+      requestAnimationFrame(loop);
+      document.querySelectorAll('[data-cursor]').forEach((el) => {
+        el.addEventListener('pointerenter', () => ring.classList.add('is-hover'));
+        el.addEventListener('pointerleave', () => ring.classList.remove('is-hover'));
+      });
+      // magnetic buttons
+      document.querySelectorAll<HTMLElement>('.magnetic').forEach((el) => {
+        el.addEventListener('pointermove', (e) => {
+          const r = el.getBoundingClientRect();
+          const x = e.clientX - (r.left + r.width / 2);
+          const y = e.clientY - (r.top + r.height / 2);
+          el.style.transform = `translate(${x * 0.18}px, ${y * 0.22}px)`;
+        });
+        el.addEventListener('pointerleave', () => { el.style.transform = ''; });
+        el.style.transition = 'transform .3s cubic-bezier(.16,1,.3,1)';
+      });
+    })();
+
+    // ── Hero constellation field (real asterisms; data flows along the lines) ──
+    (() => {
+      const canvas = document.getElementById('flux-canvas') as HTMLCanvasElement | null;
+      if (!canvas) return;
+      const ctx = canvas.getContext('2d');
+      if (!ctx) return;
+      const SIGNAL = '#b6f94c', FLUX = '#38e8d4';
+
+      // Asterisms — star coords normalized 0..1 (y down) as [x, y, magnitude],
+      // plus the lines that connect them. anchor = position on canvas, scale = relative size.
+      const CONSTELLATIONS = [
+        { // Cygnus — the Northern Cross (left)
+          anchor: [0.14, 0.32], scale: 0.10,
+          stars: [[0.5, 0.0, 1.5], [0.5, 0.45, 1.1], [0.08, 0.55, 1.0], [0.92, 0.42, 1.0], [0.5, 1.0, 1.2]],
+          edges: [[0, 1], [1, 4], [2, 1], [1, 3]],
+        },
+        { // Lyra — Vega + parallelogram (lower left)
+          anchor: [0.18, 0.72], scale: 0.08,
+          stars: [[0.5, 0.0, 1.8], [0.3, 0.4, 0.9], [0.72, 0.44, 0.9], [0.35, 0.85, 0.9], [0.78, 0.92, 0.9]],
+          edges: [[0, 1], [0, 2], [1, 3], [2, 4], [3, 4]],
+        },
+        { // Cassiopeia — the W (top right)
+          anchor: [0.78, 0.17], scale: 0.10,
+          stars: [[0.0, 0.25, 1.1], [0.25, 0.72, 1.0], [0.5, 0.28, 1.2], [0.75, 0.74, 1.0], [1.0, 0.18, 1.1]],
+          edges: [[0, 1], [1, 2], [2, 3], [3, 4]],
+        },
+        { // Orion (right)
+          anchor: [0.87, 0.45], scale: 0.14,
+          stars: [[0.20, 0.15, 1.7], [0.70, 0.08, 1.2], [0.42, 0.52, 1.0], [0.50, 0.55, 1.0], [0.58, 0.58, 1.0], [0.34, 0.95, 1.1], [0.82, 0.92, 1.8]],
+          edges: [[0, 1], [0, 2], [1, 4], [2, 3], [3, 4], [2, 5], [4, 6]],
+        },
+        { // Ursa Major — the Big Dipper (lower right)
+          anchor: [0.75, 0.80], scale: 0.13,
+          stars: [[0.05, 0.20, 1.3], [0.10, 0.58, 1.1], [0.45, 0.66, 1.1], [0.42, 0.34, 1.0], [0.66, 0.30, 1.2], [0.86, 0.22, 1.1], [1.0, 0.08, 1.3]],
+          edges: [[0, 3], [3, 2], [2, 1], [1, 0], [3, 4], [4, 5], [5, 6]],
+        },
+        { // Corona Borealis — the crown (bottom center)
+          anchor: [0.50, 0.86], scale: 0.07,
+          stars: [[0.0, 0.55, 0.9], [0.13, 0.25, 0.9], [0.32, 0.06, 1.0], [0.5, 0.0, 1.4], [0.68, 0.06, 0.9], [0.87, 0.25, 0.9], [1.0, 0.55, 0.9]],
+          edges: [[0, 1], [1, 2], [2, 3], [3, 4], [4, 5], [5, 6]],
+        },
+      ];
+
+      type Star = { x: number; y: number; r: number; phase: number; bright: boolean };
+      type Pulse = { a: number; b: number; t: number; speed: number; color: string };
+      let w = 0, h = 0, dpr = Math.min(window.devicePixelRatio || 1, 2);
+      let stars: Star[] = [];
+      let lines: [number, number][] = [];
+      let ambient: { x: number; y: number; r: number; phase: number; sp: number }[] = [];
+      let pulses: Pulse[] = [];
+      const mouse = { x: 0, y: 0, tx: 0, ty: 0 };
+
+      const build = () => {
+        stars = []; lines = []; ambient = [];
+        const span = Math.min(w, h);
+        for (const c of CONSTELLATIONS) {
+          const ax = c.anchor[0] * w, ay = c.anchor[1] * h, sz = span * c.scale * 2;
+          const off = stars.length;
+          for (const s of c.stars) {
+            stars.push({ x: ax + (s[0] - 0.5) * sz, y: ay + (s[1] - 0.5) * sz, r: s[2], phase: Math.random() * Math.PI * 2, bright: s[2] >= 1.5 });
+          }
+          for (const e of c.edges) lines.push([off + e[0], off + e[1]]);
+        }
+        const n = Math.round(Math.min(150, (w * h) / 8500));
+        ambient = Array.from({ length: n }, () => ({ x: Math.random() * w, y: Math.random() * h, r: Math.random() * 1.1 + 0.3, phase: Math.random() * Math.PI * 2, sp: 0.4 + Math.random() * 0.9 }));
+      };
+
+      const resize = () => {
+        w = canvas.clientWidth; h = canvas.clientHeight;
+        canvas.width = w * dpr; canvas.height = h * dpr;
+        ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+        build();
+      };
+
+      const spawnPulse = () => {
+        if (!lines.length) return;
+        const [a, b] = lines[(Math.random() * lines.length) | 0];
+        pulses.push({ a, b, t: 0, speed: 0.004 + Math.random() * 0.008, color: Math.random() > 0.5 ? SIGNAL : FLUX });
+      };
+
+      let t = 0, raf = 0;
+      const draw = () => {
+        t += 0.016;
+        mouse.x += (mouse.tx - mouse.x) * 0.05;
+        mouse.y += (mouse.ty - mouse.y) * 0.05;
+        const fx = mouse.x, fy = mouse.y; // foreground parallax offset
+        const bx = mouse.x * 0.4, by = mouse.y * 0.4; // background (slower)
+        ctx.clearRect(0, 0, w, h);
+
+        // ambient starfield (twinkling)
+        for (const s of ambient) {
+          ctx.globalAlpha = Math.max(0, 0.45 + Math.sin(t * s.sp + s.phase) * 0.25);
+          ctx.fillStyle = '#cdd6e6';
+          ctx.beginPath(); ctx.arc(s.x + bx, s.y + by, s.r, 0, Math.PI * 2); ctx.fill();
+        }
+        ctx.globalAlpha = 1;
+
+        // constellation lines
+        for (const [i, j] of lines) {
+          const a = stars[i], b = stars[j];
+          ctx.strokeStyle = 'rgba(150,170,205,0.18)';
+          ctx.lineWidth = 1;
+          ctx.beginPath(); ctx.moveTo(a.x + fx, a.y + fy); ctx.lineTo(b.x + fx, b.y + fy); ctx.stroke();
+        }
+
+        // constellation stars (twinkle + halo on bright ones)
+        for (const s of stars) {
+          const x = s.x + fx, y = s.y + fy;
+          if (s.bright) {
+            const g = ctx.createRadialGradient(x, y, 0, x, y, s.r * 6);
+            g.addColorStop(0, 'rgba(182,249,76,0.45)');
+            g.addColorStop(1, 'transparent');
+            ctx.fillStyle = g;
+            ctx.beginPath(); ctx.arc(x, y, s.r * 6, 0, Math.PI * 2); ctx.fill();
+          }
+          ctx.globalAlpha = Math.min(1, 0.7 + Math.sin(t * 1.3 + s.phase) * 0.3);
+          ctx.fillStyle = s.bright ? '#eaffd0' : '#dbe4f2';
+          ctx.beginPath(); ctx.arc(x, y, s.r, 0, Math.PI * 2); ctx.fill();
+          ctx.globalAlpha = 1;
+        }
+
+        // data pulses travelling along the asterism lines
+        for (let k = pulses.length - 1; k >= 0; k--) {
+          const p = pulses[k];
+          p.t += p.speed;
+          if (p.t >= 1) { pulses.splice(k, 1); continue; }
+          const a = stars[p.a], b = stars[p.b];
+          const x = a.x + (b.x - a.x) * p.t + fx, y = a.y + (b.y - a.y) * p.t + fy;
+          const g = ctx.createRadialGradient(x, y, 0, x, y, 6);
+          g.addColorStop(0, p.color); g.addColorStop(1, 'transparent');
+          ctx.fillStyle = g; ctx.beginPath(); ctx.arc(x, y, 6, 0, Math.PI * 2); ctx.fill();
+          ctx.fillStyle = p.color; ctx.beginPath(); ctx.arc(x, y, 1.6, 0, Math.PI * 2); ctx.fill();
+        }
+        if (pulses.length < 12 && Math.random() < 0.06) spawnPulse();
+
+        raf = requestAnimationFrame(draw);
+      };
+
+      window.addEventListener('pointermove', (e) => {
+        const r = canvas.getBoundingClientRect();
+        mouse.tx = ((e.clientX - r.left) / w - 0.5) * -34;
+        mouse.ty = ((e.clientY - r.top) / h - 0.5) * -34;
+      });
+      window.addEventListener('resize', resize);
+      resize();
+
+      if (reduce) {
+        for (let i = 0; i < 5; i++) spawnPulse();
+        draw(); cancelAnimationFrame(raf);
+      } else {
+        for (let i = 0; i < 5; i++) spawnPulse();
+        raf = requestAnimationFrame(draw);
+      }
+    })();
+  </script>
+</V2Layout>
