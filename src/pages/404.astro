@@ -1,47 +1,85 @@
 ---
-import Layout from '../layouts/Layout.astro';
-import Navbar from '../components/Navbar.astro';
+import V2Layout from '../layouts/V2Layout.astro';
 ---
 
-<Layout title="404 — Page not found">
-  <Navbar />
-  <main class="min-h-screen flex items-center justify-center px-6">
-    <div class="text-center max-w-lg">
-      <div class="mb-8">
-        <div class="inline-block rounded-xl border border-surface-800 bg-surface-900/60 overflow-hidden shadow-xl">
-          <div class="flex items-center gap-1.5 px-4 py-2.5 border-b border-surface-800">
-            <div class="w-2.5 h-2.5 rounded-full bg-red-500/80"></div>
-            <div class="w-2.5 h-2.5 rounded-full bg-yellow-500/80"></div>
-            <div class="w-2.5 h-2.5 rounded-full bg-green-500/80"></div>
-            <span class="text-xs text-surface-500 font-mono ml-2">bash</span>
-          </div>
-          <div class="px-6 py-5 font-mono text-sm text-left">
-            <div class="text-surface-500"><span class="text-accent-400">$</span> curl riccardomerenda.dev{Astro.url.pathname}</div>
-            <div class="text-red-400 mt-1">404 Not Found</div>
-            <div class="text-surface-500 mt-2"><span class="text-accent-400">$</span> echo "This page doesn't exist. Yet."</div>
-            <div class="text-surface-300 mt-1">This page doesn't exist. Yet.</div>
-            <div class="mt-2">
-              <span class="text-accent-400">$</span>
-              <span class="inline-block w-2 h-4 bg-surface-400 animate-pulse ml-1"></span>
-            </div>
-          </div>
+<V2Layout title="404 — Lost in space">
+  <main class="relative min-h-screen flex items-center justify-center px-6 overflow-hidden">
+    <div class="aura w-[520px] h-[520px] left-1/2 -translate-x-1/2 top-1/2 -translate-y-1/2" style="background: color-mix(in srgb, var(--color-signal-500) 8%, transparent);"></div>
+
+    <div class="relative z-10 text-center max-w-xl">
+      <p class="font-mono text-[13px] tracking-[0.25em] uppercase text-signal-500 mb-6">// signal lost</p>
+
+      <h1 class="display text-[6rem] md:text-[11rem] leading-none text-gradient mb-8">404</h1>
+
+      <div class="inline-block text-left rounded-xl border border-ink-800 bg-ink-900/60 overflow-hidden mb-9">
+        <div class="flex items-center gap-1.5 px-4 py-2.5 border-b border-ink-800">
+          <span class="w-2 h-2 rounded-full bg-ink-700"></span>
+          <span class="w-2 h-2 rounded-full bg-ink-700"></span>
+          <span class="w-2 h-2 rounded-full bg-ink-700"></span>
+          <span class="ml-2 font-mono text-[11px] text-ink-600">bash</span>
+        </div>
+        <div class="px-5 py-4 font-mono text-sm">
+          <div class="text-ink-400"><span class="text-signal-500">$</span> curl riccardomerenda.dev{Astro.url.pathname}</div>
+          <div class="text-red-400 mt-1">curl: (404) no such constellation</div>
+          <div class="text-ink-400 mt-2"><span class="text-signal-500">$</span><span class="inline-block w-2 h-4 bg-signal-500 align-middle ml-1 animate-pulse"></span></div>
         </div>
       </div>
 
-      <h1 class="text-6xl font-bold text-white mb-4">404</h1>
-      <p class="text-surface-400 mb-8">
-        Looks like this route isn't mapped yet. Let's get you back on track.
+      <p class="text-ink-400 leading-relaxed mb-9">
+        This page drifted off the map. Let’s navigate back to familiar stars.
       </p>
 
-      <a
-        href="/"
-        class="inline-flex items-center gap-2 px-6 py-3 rounded-lg bg-primary-600 hover:bg-primary-500 text-white font-medium transition-all hover:shadow-lg hover:shadow-primary-600/25"
-      >
-        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18" />
-        </svg>
+      <a href="/" data-cursor class="magnetic inline-flex items-center gap-2 rounded-full bg-signal-500 px-7 py-3.5 font-medium text-ink-950 hover:bg-signal-400 transition-colors">
+        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.2" d="M19 12H5M11 18l-6-6 6-6"/></svg>
         Back to home
       </a>
     </div>
   </main>
-</Layout>
+
+  <script>
+    const reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+    // scroll progress (sticky nav is absent here, so guard for it)
+    (() => {
+      const bar = document.getElementById('scroll-progress');
+      const onScroll = () => {
+        const h = document.documentElement;
+        const p = h.scrollTop / (h.scrollHeight - h.clientHeight || 1);
+        if (bar) bar.style.transform = `scaleX(${p})`;
+      };
+      onScroll();
+      window.addEventListener('scroll', onScroll, { passive: true });
+    })();
+
+    // custom cursor + magnetic
+    (() => {
+      if (window.matchMedia('(pointer: coarse)').matches || reduce) return;
+      const dot = document.getElementById('cursor-dot');
+      const ring = document.getElementById('cursor-ring');
+      if (!dot || !ring) return;
+      let mx = innerWidth / 2, my = innerHeight / 2, rx = mx, ry = my;
+      window.addEventListener('pointermove', (e) => {
+        mx = e.clientX; my = e.clientY;
+        dot.style.transform = `translate(${mx}px, ${my}px) translate(-50%, -50%)`;
+      });
+      const loop = () => {
+        rx += (mx - rx) * 0.18; ry += (my - ry) * 0.18;
+        ring.style.transform = `translate(${rx}px, ${ry}px) translate(-50%, -50%)`;
+        requestAnimationFrame(loop);
+      };
+      requestAnimationFrame(loop);
+      document.querySelectorAll('[data-cursor]').forEach((el) => {
+        el.addEventListener('pointerenter', () => ring.classList.add('is-hover'));
+        el.addEventListener('pointerleave', () => ring.classList.remove('is-hover'));
+      });
+      document.querySelectorAll<HTMLElement>('.magnetic').forEach((el) => {
+        el.addEventListener('pointermove', (e) => {
+          const r = el.getBoundingClientRect();
+          el.style.transform = `translate(${(e.clientX - (r.left + r.width / 2)) * 0.18}px, ${(e.clientY - (r.top + r.height / 2)) * 0.22}px)`;
+        });
+        el.addEventListener('pointerleave', () => { el.style.transform = ''; });
+        el.style.transition = 'transform .3s cubic-bezier(.16,1,.3,1)';
+      });
+    })();
+  </script>
+</V2Layout>
