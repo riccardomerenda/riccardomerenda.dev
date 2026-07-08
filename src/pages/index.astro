@@ -2,7 +2,7 @@
 import V2Layout from '../layouts/V2Layout.astro';
 
 // ── GitHub stats (live, with graceful fallback) ──
-let repos = 14;
+let repos = 16;
 let languages = 7;
 let totalStars = 7;
 try {
@@ -20,7 +20,7 @@ try {
 
 const yearsShipping = new Date().getFullYear() - 2013;
 
-const rotating = ['MCP servers', 'LLM eval tooling', 'agent observability', 'developer CLIs'];
+const rotating = ['MCP servers', 'LLM eval tooling', 'agent observability', 'developer CLIs', 'local-first tools'];
 
 const navLinks = [
   { href: '#work', label: 'Work' },
@@ -52,6 +52,36 @@ const pillars = [
 
 const projects = [
   {
+    name: 'project-graveyard',
+    tagline: 'A memory for your unfinished projects',
+    description:
+      'A local-first personal archivist for unfinished ideas and abandoned projects. Scans your repos, observes weak signals — commits, README language, silence — and remembers why each idea died, so the best parts can come back. No account, no cloud, no guilt.',
+    tech: ['Go', 'SQLite', 'CLI + Web UI', 'Local-first'],
+    github: 'https://github.com/riccardomerenda/project-graveyard',
+    accent: 'var(--color-signal-500)',
+    featured: true,
+    terminal: [
+      { p: true, t: 'grave scan ~/Projects' },
+      { p: false, t: '▸ met 12 projects — 9 new, 3 old acquaintances' },
+      { p: false, t: '▸ TinyLang may be paused (confidence: high)' },
+      { p: false, t: '▸ evidence: no commits for 43 days' },
+    ],
+  },
+  {
+    name: 'domus-scope',
+    tagline: 'Rent vs. buy decision lab',
+    description:
+      'Simulates renting vs. buying over time through two lenses — unrecoverable costs and net worth — with every number explainable down to its formula. Bilingual (EN/IT), no backend: everything stays in your browser.',
+    tech: ['TypeScript', 'React 19', 'IndexedDB', 'fast-check'],
+    github: 'https://github.com/riccardomerenda/domus-scope',
+    accent: 'var(--color-plasma-500)',
+    terminal: [
+      { p: true, t: 'pnpm --filter engine test' },
+      { p: false, t: '▸ golden vectors byte-exact · invariants hold' },
+      { p: false, t: '▸ verdict: buy beats rent in year 9' },
+    ],
+  },
+  {
     name: 'promptscore',
     tagline: 'Static analysis for LLM prompts',
     description:
@@ -59,12 +89,10 @@ const projects = [
     tech: ['TypeScript', 'Node.js', 'CLI', 'YAML Profiles', 'npm'],
     github: 'https://github.com/riccardomerenda/promptscore',
     accent: 'var(--color-signal-500)',
-    featured: true,
     terminal: [
       { p: true, t: 'promptscore analyze prompt.txt --model claude' },
       { p: false, t: '▸ Profile: claude · 12 rules loaded' },
       { p: false, t: '▸ Score: 62/100 — 1 error, 3 warnings' },
-      { p: false, t: '▸ Top: missing-task, no-examples' },
     ],
   },
   {
@@ -123,6 +151,20 @@ const projects = [
       { p: false, t: '▸ 12,840 in / 3,210 out · $0.08' },
     ],
   },
+  {
+    name: 'design-court',
+    tagline: 'A technical court for design documents',
+    description:
+      'Adversarial review for RFCs and ADRs: agents propose findings, evidence is machine-verified against the document, and a Judge accepts, rejects or escalates. Every finding cites verifiable evidence.',
+    tech: ['C#', '.NET 10', 'Agents', 'Evidence-gated'],
+    github: 'https://github.com/riccardomerenda/design-court',
+    accent: 'var(--color-plasma-500)',
+    terminal: [
+      { p: true, t: 'design-court review payment-rfc.md' },
+      { p: false, t: '▸ Parsed 5 sections · 1 judged finding' },
+      { p: false, t: '▸ F-OPS-001: missing rollback plan (high)' },
+    ],
+  },
 ];
 
 const stack = [
@@ -167,7 +209,7 @@ const jobs = [
   },
 ];
 
-const marquee = ['MCP', 'RAG', 'Elasticsearch', '.NET', 'Python', 'Go', 'LLM Agents', 'Vector Search', 'Observability', 'Developer Tools', 'FastAPI', 'CLI', 'Semantic Search', 'Docker'];
+const marquee = ['MCP', 'RAG', 'Elasticsearch', '.NET', 'Python', 'Go', 'LLM Agents', 'Vector Search', 'Observability', 'Developer Tools', 'Local-first', 'FastAPI', 'CLI', 'Semantic Search', 'Docker'];
 ---
 
 <V2Layout>
@@ -575,7 +617,7 @@ const marquee = ['MCP', 'RAG', 'Elasticsearch', '.NET', 'Python', 'Go', 'LLM Age
     (() => {
       const el = document.getElementById('rotator');
       if (!el || reduce) return;
-      const words = ['MCP servers', 'LLM eval tooling', 'agent observability', 'developer CLIs'];
+      const words = ['MCP servers', 'LLM eval tooling', 'agent observability', 'developer CLIs', 'local-first tools'];
       let i = 0;
       setInterval(() => {
         i = (i + 1) % words.length;
