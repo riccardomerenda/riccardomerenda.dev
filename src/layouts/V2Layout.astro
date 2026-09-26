@@ -41,15 +41,12 @@ const {
     <noscript>
       <style>
         [data-reveal] { opacity: 1 !important; transform: none !important; }
-        .cursor-ring, .cursor-dot, .flux-canvas { display: none !important; }
-        body.flux { cursor: auto !important; }
+        .flux-canvas { display: none !important; }
       </style>
     </noscript>
   </head>
   <body class="flux antialiased">
     <div class="scroll-progress" id="scroll-progress"></div>
-    <div class="cursor-ring" id="cursor-ring" aria-hidden="true"></div>
-    <div class="cursor-dot" id="cursor-dot" aria-hidden="true"></div>
     <div class="flux-grain" aria-hidden="true"></div>
 
     <slot />

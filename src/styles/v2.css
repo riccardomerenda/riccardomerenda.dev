@@ -49,49 +49,6 @@ body.flux ::selection {
   color: var(--color-ink-950);
 }
 
-/* Hide native cursor on fine-pointer devices (custom cursor takes over) */
-@media (pointer: fine) {
-  body.flux,
-  body.flux a,
-  body.flux button {
-    cursor: none;
-  }
-}
-
-/* ── Custom cursor ── */
-.cursor-ring,
-.cursor-dot {
-  position: fixed;
-  top: 0;
-  left: 0;
-  pointer-events: none;
-  z-index: 9999;
-  border-radius: 9999px;
-  transform: translate(-50%, -50%);
-  will-change: transform;
-}
-.cursor-dot {
-  width: 6px;
-  height: 6px;
-  background: var(--color-signal-500);
-}
-.cursor-ring {
-  width: 34px;
-  height: 34px;
-  border: 1px solid color-mix(in srgb, var(--color-signal-500) 60%, transparent);
-  transition: width 0.25s ease, height 0.25s ease, border-color 0.25s ease, background-color 0.25s ease;
-}
-.cursor-ring.is-hover {
-  width: 56px;
-  height: 56px;
-  border-color: color-mix(in srgb, var(--color-flux-500) 70%, transparent);
-  background: color-mix(in srgb, var(--color-flux-500) 10%, transparent);
-}
-@media (pointer: coarse) {
-  .cursor-ring,
-  .cursor-dot { display: none; }
-}
-
 /* ── Scroll progress bar ── */
 .scroll-progress {
   position: fixed;
@@ -139,14 +96,15 @@ body.flux ::selection {
   letter-spacing: -0.04em;
   line-height: 0.92;
 }
+/* Capped by viewport height too, so the hero CTAs stay above the fold on laptops */
 .display-xl {
-  font-size: clamp(2.75rem, 9vw, 8.5rem);
+  font-size: clamp(2.75rem, min(8vw, 12vh), 7.5rem);
 }
 
 /* Outlined / ghost text */
 .text-outline {
   color: transparent;
-  -webkit-text-stroke: 1px var(--color-ink-700);
+  -webkit-text-stroke: 2px var(--color-ink-200);
 }
 
 /* ── Reveal on scroll (with safe fallbacks) ── */
